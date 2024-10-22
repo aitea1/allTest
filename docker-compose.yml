@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  aws-sdk-go-v2-ssm:
+    container_name: AWS-SDK-Go-v2-ssm
+    build:
+      context: .
+      dockerfile: ./ssmTest/docker/dockerfile
+    tty: true
+    volumes:
+      - ./ssmTest/src:/ssmTest
+    ports:
+      - 8080:8080
