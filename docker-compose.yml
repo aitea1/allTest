@@ -1,7 +1,7 @@
 version: "3.8"
 services:
-  aws-sdk-go-v2-ssm:
-    container_name: AWS-SDK-Go-v2-ssm
+  aws-sdk-go-v2_ssm_trial:
+    container_name: AWS-SDK-Go-v2_ssm_trial
     build:
       context: .
       dockerfile: ./ssmTest/docker/dockerfile
