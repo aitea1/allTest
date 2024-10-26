@@ -4,9 +4,9 @@ services:
     container_name: AWS-SDK-Go-v2-ssm
     build:
       context: .
-      dockerfile: ./ssmTest/docker/dockerfile
+      dockerfile: ./trial/docker/dockerfile
     tty: true
     volumes:
-      - ./ssmTest/src:/ssmTest
+      - ./trial/src:/trial
     ports:
       - 8080:8080
