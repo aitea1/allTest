@@ -1,12 +1,13 @@
 version: "3.8"
 services:
-  aws-sdk-go-v2-ssm:
-    container_name: AWS-SDK-Go-v2-ssm
-    build:
-      context: .
-      dockerfile: ./trial/docker/dockerfile
-    tty: true
+  terraform-trial:
+    image: hashicorp/terraform:1.7.5
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-ap-northeast-1}
     volumes:
-      - ./trial/src:/trial
-    ports:
-      - 8080:8080
+      - ./trial/terraform:/terraform
+    working_dir: /terraform
+    entrypoint: ash
+    tty: true
