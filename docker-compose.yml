@@ -1,12 +1,27 @@
 version: "3.8"
 services:
-  aws-sdk-go-v2-ssm:
-    container_name: AWS-SDK-Go-v2-ssm
+  bedrock-batch-start:
+    container_name: bedrock-batch-start
+    environment:
+      - AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID_TEERA}
     build:
       context: .
-      dockerfile: ./trial/docker/dockerfile
+      dockerfile: ./bedrock-batch-start/docker/dockerfile
     tty: true
     volumes:
-      - ./trial/src:/trial
+      - ./bedrock-batch-start/src:/src
     ports:
       - 8080:8080
+
+  terraform:
+    image: hashicorp/terraform:1.7.5
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_TEERA}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_TEERA}
+      - AWS_REGION=${AWS_REGION}
+      - TF_VAR_aws_account_id=${AWS_ACCOUNT_ID_TEERA}
+    volumes:
+      - ./terraform:/terraform
+    working_dir: /terraform
+    entrypoint: ash
+    tty: true

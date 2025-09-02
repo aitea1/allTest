@@ -1,0 +1,68 @@
+name: Lambda自動デプロイ
+
+on:
+  push:
+    branches:
+      - Go-BedrockBatch-Lambda
+    # 手動実行有効
+    workflow_dispatch:
+  pull_request:
+    branches: [Go-BedrockBatch-Lambda]
+    paths:
+      - "bedrock-batch-start/**"
+
+env:
+  GO_VERSION: "1.24"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: リポジトリのチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Go環境のセットアップ
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: AWS認証情報の設定
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: trial-bedrockBatchStart Lambda関数のビルド
+        run: |
+          # trial-bedrockBatchStartのソースコードがあるディレクトリに移動
+          cd bedrock-batch-start/src
+          # Go依存関係の初期化とgo.sumファイルの生成
+          go mod tidy
+          # Go依存関係の取得
+          go mod download
+          # 現在のディレクトリ（.）のmainパッケージをLinuxバイナリとしてビルド
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o bootstrap .
+          # デプロイ用ZIPファイルの作成
+          zip function.zip bootstrap
+
+      - name: trial-bedrockBatchStart Lambda関数のデプロイ
+        run: |
+          cd bedrock-batch-start/src
+          # Lambda関数コードの更新
+          aws lambda update-function-code \
+            --function-name trial-bedrockBatchStart \
+            --zip-file fileb://function.zip \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: デプロイ結果の確認
+        run: |
+          echo "✅ trial-bedrockBatchStart Lambda関数のデプロイが完了しました"
+          aws lambda get-function \
+            --function-name trial-bedrockBatchStart \
+            --region ${{ secrets.AWS_REGION }} \
+            --query 'Configuration.[FunctionName,Runtime,LastModified]' \
+            --output table
