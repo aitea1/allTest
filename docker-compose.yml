@@ -1,12 +1,10 @@
 version: "3.8"
+
 services:
-  aws-sdk-go-v2-ssm:
-    container_name: AWS-SDK-Go-v2-ssm
-    build:
-      context: .
-      dockerfile: ./trial/docker/dockerfile
+  vue-firebase-hosting:
+    image: node:24
     tty: true
     volumes:
-      - ./trial/src:/trial
+      - ./vueFirebaseHosting/src:/vueFirebaseHosting
     ports:
-      - 8080:8080
+      - "3001:3001"
