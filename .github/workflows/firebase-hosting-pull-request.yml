@@ -11,11 +11,18 @@ jobs:
   build_and_preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    # Vue.jsプロジェクトのディレクトリに移動して作業
+    defaults:
+      run:
+        working-directory: ./vueFIrebaseHosting/src/view
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci && npm run build
+      - name: Install dependencies and build
+        run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OTAMESHI_EA83D }}
           projectId: otameshi-ea83d
+          # Firebase設定ファイルの場所を指定
+          entryPoint: ./vueFIrebaseHosting/src/view
